@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Req,
 } from '@nestjs/common';
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
@@ -78,4 +79,16 @@ export class ApplicationController {
   ) {
     return this.applicationService.getUserApplications(userId);
   }
+
+@Post(':applicationId/remind')
+async remindRecruiter(
+  @Param('applicationId') applicationId: string,
+  @Req() req,
+) {
+  return this.applicationService.sendReminderToRecruiter(
+    applicationId,
+    req.user.userId,
+  );
+}
+
 }

@@ -111,7 +111,7 @@ model Application {
   skillSummary  String?
   onHold        Boolean  @default(false)
   isDeleted     Boolean  @default(false)
-
+  lastReminderAt DateTime?
   // ✅ FK must match Job.id (UUID)
   jobId String @db.Uuid
   job   Job    @relation(fields: [jobId], references: [id])

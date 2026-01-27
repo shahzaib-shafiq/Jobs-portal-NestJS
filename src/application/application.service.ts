@@ -2,14 +2,16 @@ import {
   Injectable,
   NotFoundException,
   ConflictException,
+  ForbiddenException,
+  BadRequestException
 } from '@nestjs/common';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
 import { PrismaService } from '../../prisma/prisma.service';
-
+import { NotificationService } from '../notification/notification.service';
 @Injectable()
 export class ApplicationService {
-  constructor(private prisma: PrismaService) { }
+  constructor(private prisma: PrismaService, private notificationService: NotificationService) { }
 
   // ✅ Create Application (Users can apply to many jobs)
   async create(createApplicationDto: CreateApplicationDto) {
@@ -206,5 +208,62 @@ export class ApplicationService {
       },
     });
   }
+
+async sendReminderToRecruiter(
+  applicationId: string,
+  candidateId: string,
+) {
+  const application = await this.prisma.application.findFirst({
+    where: {
+      id: applicationId,
+      isDeleted: false,
+    },
+    include: {
+      job: true,
+      user: true,
+    },
+  });
+
+  if (!application) {
+    throw new NotFoundException('Application not found');
+  }
+
+  // ✅ Ownership check
+  if (application.userId !== candidateId) {
+    throw new ForbiddenException('You cannot remind for this application');
+  }
+
+  // ✅ Status guard
+  if (['REJECTED', 'HIRED'].includes(application.status)) {
+    throw new BadRequestException(
+      'Cannot send reminder for this application status',
+    );
+  }
+  // ✅ Create notification for recruiter
+  const recruiterId = application.job.createdById;
+
+if (!recruiterId) {
+  throw new BadRequestException(
+    'Cannot send reminder: job creator not found',
+  );
+}
+
+await this.notificationService.create({
+  userId: recruiterId,
+  message: `Reminder: ${application.user.firstName} followed up on "${application.job.title}"`,
+});
+  // (Optional) track reminder time
+  await this.prisma.application.update({
+    where: { id: applicationId },
+    data: {
+      lastReminderAt: new Date(),
+    },
+  });
+
+  return {
+    message: 'Reminder sent successfully',
+  };
+}
+
 
 }
