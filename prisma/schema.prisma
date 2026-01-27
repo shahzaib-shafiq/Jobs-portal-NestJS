@@ -17,19 +17,24 @@ model User {
   id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   firstName     String        @db.VarChar(50)
   lastName      String        @db.VarChar(50)
-  email         String        @unique @db.VarChar(50)
+  email         String        @unique @db.VarChar(255)
   password      String        @db.VarChar(255)
   role          Role
   profileSummary String?      
   resumeUrl     String?
-  adress        String?        @db.VarChar(255)
+  address        String?        @db.VarChar(255)
   isDeleted     Boolean  @default(false)
   isVerified     Boolean  @default(true)
   refreshToken  String?    
-  phone         String?        @db.VarChar(12)
+  phone         String?        @db.VarChar(20)
 
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  passwordResetToken String?
+  passwordResetAt    DateTime?
+  lastLoginAt DateTime?
+emailVerifiedAt DateTime?
+
 
   // Relations
   companies     Company[]     @relation("CompanyCreatedBy")
@@ -37,6 +42,11 @@ model User {
   applications  Application[]
   savedJobs     SavedJob[]
   notifications Notification[]
+
+  @@index([email])
+@@index([role])
+@@index([isDeleted])
+
 }
 
 model Company {
