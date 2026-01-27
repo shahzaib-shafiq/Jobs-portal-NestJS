@@ -14,7 +14,7 @@ import { UpdateApplicationDto } from './dto/update-application.dto';
 
 @Controller('application')
 export class ApplicationController {
-  constructor(private readonly applicationService: ApplicationService) {}
+  constructor(private readonly applicationService: ApplicationService) { }
 
   @Post()
   create(@Body() createApplicationDto: CreateApplicationDto) {
@@ -70,5 +70,12 @@ export class ApplicationController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.applicationService.remove(id);
+  }
+
+  @Get('user-applications/:userId')
+  getUserApplications(
+    @Param('userId') userId: string
+  ) {
+    return this.applicationService.getUserApplications(userId);
   }
 }
