@@ -71,4 +71,11 @@ export class ApplicationController {
   remove(@Param('id') id: string) {
     return this.applicationService.remove(id);
   }
+
+  @Get(':userId')
+  getUserApplications(
+    @Param('userId') userId: string
+  ) {
+    return this.applicationService.getUserApplications(userId);
+  }
 }

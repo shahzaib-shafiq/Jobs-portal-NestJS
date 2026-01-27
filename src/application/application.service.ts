@@ -9,7 +9,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ApplicationService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // ✅ Create Application (Users can apply to many jobs)
   async create(createApplicationDto: CreateApplicationDto) {
@@ -194,4 +194,17 @@ export class ApplicationService {
 
     return !!application;
   }
+
+  async getUserApplications(userId: string) {
+    return this.prisma.application.findMany({
+      where: {
+        userId,
+        isDeleted: false,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
 }
