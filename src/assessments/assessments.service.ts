@@ -22,7 +22,7 @@ export class AssessmentsService {
         createdById: userId,
         applicationId: dto.applicationId,
         questions: {
-          create: dto.questions.map(q => ({
+          create: dto.questions.map((q) => ({
             questionText: q.questionText,
             type: q.type,
             order: q.order,
@@ -68,7 +68,7 @@ export class AssessmentsService {
     }
 
     await this.prisma.assessmentAnswer.createMany({
-      data: dto.answers.map(a => ({
+      data: dto.answers.map((a) => ({
         submissionId: submission.id,
         questionId: a.questionId,
         textAnswer: a.textAnswer,

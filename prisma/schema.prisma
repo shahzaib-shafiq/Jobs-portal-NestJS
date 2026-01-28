@@ -199,9 +199,12 @@ model AssessmentSubmission {
   candidate   User   @relation(fields: [candidateId], references: [id])
 
   submittedAt DateTime?
-  status      AssessmentSubmissionStatus @default(PENDING)
+  reviewedAt  DateTime?
 
-  answers AssessmentAnswer[]
+  status   AssessmentSubmissionStatus @default(PENDING)
+  score    Float?
+  feedback String?
+  answers  AssessmentAnswer[]
 
   createdAt DateTime @default(now())
 
