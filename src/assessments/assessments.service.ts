@@ -6,12 +6,12 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateAssessmentDto } from './dto/create-assessment.dto';
 import { SubmitAssessmentDto } from './dto/submit-assessment.dto';
-
+import { ScoreAssessmentDto } from './dto/score-assessment.dto';
 import { AssessmentSubmissionStatus } from '@prisma/client';
 
 @Injectable()
 export class AssessmentsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   // Recruiter creates assessment
   async createAssessment(userId: string, dto: CreateAssessmentDto) {
@@ -118,4 +118,70 @@ export class AssessmentsService {
       },
     });
   }
+
+  async scoreSubmission(
+    assessmentId: string,
+    candidateId: string,
+    recruiterId: string,
+    dto: ScoreAssessmentDto,
+  ) {
+    const assessment = await this.prisma.assessment.findUnique({
+      where: { id: assessmentId },
+    });
+
+    if (!assessment || assessment.createdById !== recruiterId) {
+      throw new ForbiddenException('Not allowed');
+    }
+
+    const submission = await this.prisma.assessmentSubmission.findUnique({
+      where: {
+        assessmentId_candidateId: {
+          assessmentId,
+          candidateId,
+        },
+      },
+    });
+
+    if (!submission || submission.status !== 'SUBMITTED') {
+      throw new NotFoundException('Submission not found or not submitted');
+    }
+
+    return this.prisma.assessmentSubmission.update({
+      where: { id: submission.id },
+      data: {
+        score: dto.score,
+        feedback: dto.feedback,
+        status: 'REVIEWED',
+        reviewedAt: new Date(),
+      },
+    });
+  }
+  async getAssessmentResult(
+    assessmentId: string,
+    candidateId: string,
+  ) {
+    const submission = await this.prisma.assessmentSubmission.findUnique({
+      where: {
+        assessmentId_candidateId: {
+          assessmentId,
+          candidateId,
+        },
+      },
+      include: {
+        assessment: {
+          include: { questions: true },
+        },
+        answers: {
+          include: { question: true },
+        },
+      },
+    });
+
+    if (!submission) {
+      throw new NotFoundException('Result not found');
+    }
+
+    return submission;
+  }
+
 }

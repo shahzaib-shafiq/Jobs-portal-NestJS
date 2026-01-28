@@ -11,7 +11,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AssessmentsService } from './assessments.service';
 import { CreateAssessmentDto } from './dto/create-assessment.dto';
 import { SubmitAssessmentDto } from './dto/submit-assessment.dto';
-
+import { ScoreAssessmentDto } from './dto/score-assessment.dto';
 @Controller('assessments')
 @UseGuards(AuthGuard('jwt'))
 export class AssessmentsController {
@@ -52,5 +52,24 @@ export class AssessmentsController {
   @Get(':assessmentId/submissions')
   submissions(@Req() req, @Param('assessmentId') assessmentId: string) {
     return this.service.getAssessmentSubmissions(assessmentId, req.user.userId);
+  }
+  @Post(':assessmentId/score/:candidateId')
+  score(
+    @Req() req,
+    @Param('assessmentId') assessmentId: string,
+    @Param('candidateId') candidateId: string,
+    @Body() dto: ScoreAssessmentDto,
+  ) {
+    return this.service.scoreSubmission(
+      assessmentId,
+      candidateId,
+      req.user.userId,
+      dto,
+    );
+  }
+
+  @Get(':assessmentId/result')
+  getResult(@Req() req, @Param('assessmentId') assessmentId: string) {
+    return this.service.getAssessmentResult(assessmentId, req.user.userId);
   }
 }
