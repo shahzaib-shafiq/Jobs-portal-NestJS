@@ -14,39 +14,42 @@ generator client {
 // Models
 // -------------------------
 model User {
-  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  firstName     String        @db.VarChar(50)
-  lastName      String        @db.VarChar(50)
-  email         String        @unique @db.VarChar(255)
-  password      String        @db.VarChar(255)
-  role          Role
-  profileSummary String?      
-  resumeUrl     String?
-  address        String?        @db.VarChar(255)
-  isDeleted     Boolean  @default(false)
-  isVerified     Boolean  @default(true)
-  refreshToken  String?    
-  phone         String?        @db.VarChar(20)
+  id             String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  firstName      String  @db.VarChar(50)
+  lastName       String  @db.VarChar(50)
+  email          String  @unique @db.VarChar(255)
+  password       String  @db.VarChar(255)
+  role           Role
+  profileSummary String?
+  resumeUrl      String?
+  address        String? @db.VarChar(255)
+  isDeleted      Boolean @default(false)
+  isVerified     Boolean @default(true)
+  refreshToken   String?
+  phone          String? @db.VarChar(20)
 
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
   passwordResetToken String?
   passwordResetAt    DateTime?
-  lastLoginAt DateTime?
-emailVerifiedAt DateTime?
-
+  lastLoginAt        DateTime?
+  emailVerifiedAt    DateTime?
 
   // Relations
-  companies     Company[]     @relation("CompanyCreatedBy")
-  jobs          Job[]         @relation("JobCreatedBy")
-  applications  Application[]
-  savedJobs     SavedJob[]
-  notifications Notification[]
+  companies             Company[]              @relation("CompanyCreatedBy")
+  jobs                  Job[]                  @relation("JobCreatedBy")
+  applications          Application[]
+  savedJobs             SavedJob[]
+  notifications         Notification[]
+  assessmentsCreated    Assessment[]           @relation("AssessmentCreatedBy")
+  assessmentSubmissions AssessmentSubmission[]
+  interviewsCreated     Interview[]            @relation("InterviewCreatedBy")
+  interviewFeedbacks    InterviewFeedback[]
+  interviewAssignments  InterviewInterviewer[]
 
   @@index([email])
-@@index([role])
-@@index([isDeleted])
-
+  @@index([role])
+  @@index([isDeleted])
 }
 
 model Company {
@@ -58,12 +61,12 @@ model Company {
   logoUrl     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-    isDeleted     Boolean  @default(false)
+  isDeleted   Boolean  @default(false)
   // ✅ FK must match User.id (UUID)
   createdById String?  @db.Uuid
   createdBy   User?    @relation("CompanyCreatedBy", fields: [createdById], references: [id])
 
-  jobs        Job[]
+  jobs Job[]
 }
 
 model Job {
@@ -75,50 +78,53 @@ model Job {
   salary      Float?
   comments    String?
   industry    String?
-  skills      String[] 
+  skills      String[]
   year        Int?
   budget      Float?
-    isDeleted     Boolean  @default(false)
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // ✅ FK must match User.id (UUID)
-  createdById String?  @db.Uuid
-  createdBy   User?    @relation("JobCreatedBy", fields: [createdById], references: [id])
+  createdById String? @db.Uuid
+  createdBy   User?   @relation("JobCreatedBy", fields: [createdById], references: [id])
 
   // ✅ FK must match Company.id (UUID)
-  companyId   String?  @db.Uuid
-  company     Company? @relation(fields: [companyId], references: [id])
+  companyId String?  @db.Uuid
+  company   Company? @relation(fields: [companyId], references: [id])
 
   applications Application[]
   savedJobs    SavedJob[]
 }
 
 model Application {
-  id          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  status      ApplicationStatus  @default(PENDING)
-  coverLetter String?
-  resumeUrl   String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  type        String?
-  jobSource   String?
-  currentStatus String?
-  score         Float? 
-  comments      String?
+  id             String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  status         ApplicationStatus @default(PENDING)
+  coverLetter    String?
+  resumeUrl      String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  type           String?
+  jobSource      String?
+  currentStatus  String?
+  score          Float?
+  comments       String?
   gpa            Float?
-  skillSummary  String?
-  onHold        Boolean  @default(false)
-  isDeleted     Boolean  @default(false)
+  skillSummary   String?
+  onHold         Boolean           @default(false)
+  isDeleted      Boolean           @default(false)
   lastReminderAt DateTime?
   // ✅ FK must match Job.id (UUID)
-  jobId String @db.Uuid
-  job   Job    @relation(fields: [jobId], references: [id])
+  jobId          String            @db.Uuid
+  job            Job               @relation(fields: [jobId], references: [id])
 
   // ✅ FK must match User.id (UUID)
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
+
+  assessments Assessment[]
+  interviews  Interview[]
 
   // ✅ Unique constraint: prevent duplicate applications (same user applying to same job)
   @@unique([userId, jobId])
@@ -129,12 +135,12 @@ model SavedJob {
   createdAt DateTime @default(now())
 
   // ✅ FK must match User.id (UUID)
-  userId String @db.Uuid
-  user   User   @relation(fields: [userId], references: [id])
-  isDeleted     Boolean  @default(false)
+  userId    String  @db.Uuid
+  user      User    @relation(fields: [userId], references: [id])
+  isDeleted Boolean @default(false)
   // ✅ FK must match Job.id (UUID)
-  jobId String @db.Uuid
-  job   Job    @relation(fields: [jobId], references: [id])
+  jobId     String  @db.Uuid
+  job       Job     @relation(fields: [jobId], references: [id])
 }
 
 model Notification {
@@ -142,22 +148,189 @@ model Notification {
   message   String
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
-    isDeleted     Boolean  @default(false)
+  isDeleted Boolean  @default(false)
   // ✅ FK must match User.id (UUID)
-  userId String @db.Uuid
-  user   User   @relation(fields: [userId], references: [id])
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Blacklist {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  accessToken  String?  
-  refreshToken  String?  
-    
+  id           String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accessToken  String?
+  refreshToken String?
+}
+
+model Assessment {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  // recruiter
+  createdById String @db.Uuid
+  createdBy   User   @relation("AssessmentCreatedBy", fields: [createdById], references: [id])
+
+  // application
+  applicationId String?      @db.Uuid
+  application   Application? @relation(fields: [applicationId], references: [id])
+
+  questions   AssessmentQuestion[]
+  submissions AssessmentSubmission[]
+}
+
+model AssessmentQuestion {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessmentId String     @db.Uuid
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+
+  questionText String
+  type         QuestionType
+  order        Int
+
+  createdAt DateTime           @default(now())
+  answers   AssessmentAnswer[]
+}
+
+model AssessmentSubmission {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  assessmentId String     @db.Uuid
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+
+  candidateId String @db.Uuid
+  candidate   User   @relation(fields: [candidateId], references: [id])
+
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+
+  status   AssessmentSubmissionStatus @default(PENDING)
+  score    Float?
+  feedback String?
+  answers  AssessmentAnswer[]
+
+  createdAt DateTime @default(now())
+
+  @@unique([assessmentId, candidateId])
+}
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  REVIEWED
+}
+
+model AssessmentAnswer {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  submissionId String               @db.Uuid
+  submission   AssessmentSubmission @relation(fields: [submissionId], references: [id])
+
+  questionId String             @db.Uuid
+  question   AssessmentQuestion @relation(fields: [questionId], references: [id])
+
+  textAnswer    String?
+  booleanAnswer Boolean?
+
+  createdAt DateTime @default(now())
+
+  @@unique([submissionId, questionId])
+}
+
+model Interview {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  applicationId String      @db.Uuid
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  type   InterviewType
+  round  Int
+  status InterviewStatus
+
+  scheduledAt DateTime
+  durationMin Int?
+
+  meetingLink String?
+  location    String?
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("InterviewCreatedBy", fields: [createdById], references: [id])
+
+  interviewers InterviewInterviewer[]
+  feedbacks    InterviewFeedback[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+}
+
+model InterviewInterviewer {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  interviewId String    @db.Uuid
+  interview   Interview @relation(fields: [interviewId], references: [id])
+
+  interviewerId String @db.Uuid
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+
+  @@unique([interviewId, interviewerId])
+}
+
+model InterviewFeedback {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  interviewId String    @db.Uuid
+  interview   Interview @relation(fields: [interviewId], references: [id])
+
+  interviewerId String @db.Uuid
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+
+  score          Float?
+  recommendation InterviewRecommendation
+  notes          String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([interviewId, interviewerId])
 }
 
 // -------------------------
 // Enums
 // -------------------------
+
+enum InterviewType {
+  HR
+  TECHNICAL
+  MANAGERIAL
+  CULTURE
+  FINAL
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum InterviewRecommendation {
+  STRONG_YES
+  YES
+  NO
+  STRONG_NO
+}
+
+enum QuestionType {
+  TEXT
+  BOOLEAN
+}
+
+enum AssessmentSubmissionStatus {
+  PENDING
+  SUBMITTED
+  REVIEWED
+}
+
 enum Role {
   candidate
   recruiter
