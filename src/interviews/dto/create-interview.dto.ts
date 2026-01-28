@@ -1,3 +1,5 @@
+import { InterviewRecommendation, InterviewType } from "@prisma/client";
+
 export class ScheduleInterviewDto {
     applicationId: string;
     type: InterviewType;

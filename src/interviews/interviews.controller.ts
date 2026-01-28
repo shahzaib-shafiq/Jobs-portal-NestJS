@@ -1,3 +1,8 @@
+import { Controller, Get, Post, Req, Body, Param, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { InterviewService } from './interviews.service';
+import { ScheduleInterviewDto ,SubmitInterviewFeedbackDto} from './dto/create-interview.dto';
+
 @Controller('interviews')
 @UseGuards(AuthGuard('jwt'))
 export class InterviewController {

@@ -1,3 +1,6 @@
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "../../prisma/prisma.service";
+import { ScheduleInterviewDto, SubmitInterviewFeedbackDto } from "./dto/create-interview.dto";
 @Injectable()
 export class InterviewService {
   constructor(private prisma: PrismaService) {}
