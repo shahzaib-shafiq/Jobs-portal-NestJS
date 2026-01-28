@@ -43,6 +43,9 @@ model User {
   notifications         Notification[]
   assessmentsCreated    Assessment[]           @relation("AssessmentCreatedBy")
   assessmentSubmissions AssessmentSubmission[]
+  interviewsCreated     Interview[]            @relation("InterviewCreatedBy")
+  interviewFeedbacks    InterviewFeedback[]
+  interviewAssignments  InterviewInterviewer[]
 
   @@index([email])
   @@index([role])
@@ -121,6 +124,7 @@ model Application {
   user   User   @relation(fields: [userId], references: [id])
 
   assessments Assessment[]
+  interviews  Interview[]
 
   // ✅ Unique constraint: prevent duplicate applications (same user applying to same job)
   @@unique([userId, jobId])
@@ -234,9 +238,88 @@ model AssessmentAnswer {
   @@unique([submissionId, questionId])
 }
 
+model Interview {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  applicationId String      @db.Uuid
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  type   InterviewType
+  round  Int
+  status InterviewStatus
+
+  scheduledAt DateTime
+  durationMin Int?
+
+  meetingLink String?
+  location    String?
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("InterviewCreatedBy", fields: [createdById], references: [id])
+
+  interviewers InterviewInterviewer[]
+  feedbacks    InterviewFeedback[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+}
+
+model InterviewInterviewer {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  interviewId String    @db.Uuid
+  interview   Interview @relation(fields: [interviewId], references: [id])
+
+  interviewerId String @db.Uuid
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+
+  @@unique([interviewId, interviewerId])
+}
+
+model InterviewFeedback {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  interviewId String    @db.Uuid
+  interview   Interview @relation(fields: [interviewId], references: [id])
+
+  interviewerId String @db.Uuid
+  interviewer   User   @relation(fields: [interviewerId], references: [id])
+
+  score          Float?
+  recommendation InterviewRecommendation
+  notes          String?
+
+  createdAt DateTime @default(now())
+
+  @@unique([interviewId, interviewerId])
+}
+
 // -------------------------
 // Enums
 // -------------------------
+
+enum InterviewType {
+  HR
+  TECHNICAL
+  MANAGERIAL
+  CULTURE
+  FINAL
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum InterviewRecommendation {
+  STRONG_YES
+  YES
+  NO
+  STRONG_NO
+}
+
 enum QuestionType {
   TEXT
   BOOLEAN
