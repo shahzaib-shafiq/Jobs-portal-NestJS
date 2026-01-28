@@ -13,6 +13,7 @@ import { NotificationModule } from './notification/notification.module';
 import { AssessmentsModule } from './assessments/assessments.module';
 import { OffersModule } from './offers/offers.module';
 import { RefralsModule } from './refrals/refrals.module';
+import { InterviewsModule } from './interviews/interviews.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { RefralsModule } from './refrals/refrals.module';
     AssessmentsModule,
     OffersModule,
     RefralsModule,
+    InterviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
