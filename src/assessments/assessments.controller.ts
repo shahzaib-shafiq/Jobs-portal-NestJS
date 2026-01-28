@@ -1,34 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AssessmentsService } from './assessments.service';
 import { CreateAssessmentDto } from './dto/create-assessment.dto';
-import { UpdateAssessmentDto } from './dto/update-assessment.dto';
+import { SubmitAssessmentDto } from './dto/submit-assessment.dto';
 
 @Controller('assessments')
+@UseGuards(AuthGuard('jwt'))
 export class AssessmentsController {
-  constructor(private readonly assessmentsService: AssessmentsService) {}
+  constructor(private service: AssessmentsService) {}
 
+  // Recruiter creates assessment
   @Post()
-  create(@Body() createAssessmentDto: CreateAssessmentDto) {
-    return this.assessmentsService.create(createAssessmentDto);
+  create(@Req() req, @Body() dto: CreateAssessmentDto) {
+    return this.service.createAssessment(req.user.userId, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.assessmentsService.findAll();
+  // Recruiter assigns assessment to candidate
+  @Post(':assessmentId/assign/:candidateId')
+  assign(
+    @Param('assessmentId') assessmentId: string,
+    @Param('candidateId') candidateId: string,
+  ) {
+    return this.service.assignAssessment(assessmentId, candidateId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.assessmentsService.findOne(+id);
+  // Candidate submits assessment
+  @Post(':assessmentId/submit')
+  submit(
+    @Req() req,
+    @Param('assessmentId') assessmentId: string,
+    @Body() dto: SubmitAssessmentDto,
+  ) {
+    return this.service.submitAssessment(assessmentId, req.user.userId, dto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAssessmentDto: UpdateAssessmentDto) {
-    return this.assessmentsService.update(+id, updateAssessmentDto);
+  // Candidate views own assessments
+  @Get('me')
+  myAssessments(@Req() req) {
+    return this.service.getMyAssessments(req.user.userId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.assessmentsService.remove(+id);
+  // Recruiter views submissions
+  @Get(':assessmentId/submissions')
+  submissions(@Req() req, @Param('assessmentId') assessmentId: string) {
+    return this.service.getAssessmentSubmissions(assessmentId, req.user.userId);
   }
 }
