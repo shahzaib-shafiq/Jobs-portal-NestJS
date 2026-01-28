@@ -10,6 +10,9 @@ import { JobModule } from './job/job.module';
 import { ApplicationModule } from './application/application.module';
 import { SavedJobModule } from './saved-job/saved-job.module';
 import { NotificationModule } from './notification/notification.module';
+import { AssessmentsModule } from './assessments/assessments.module';
+import { OffersModule } from './offers/offers.module';
+import { RefralsModule } from './refrals/refrals.module';
 
 @Module({
   imports: [
@@ -25,6 +28,9 @@ import { NotificationModule } from './notification/notification.module';
     ApplicationModule,
     SavedJobModule,
     NotificationModule,
+    AssessmentsModule,
+    OffersModule,
+    RefralsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
