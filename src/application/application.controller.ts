@@ -12,10 +12,15 @@ import {
 import { ApplicationService } from './application.service';
 import { CreateApplicationDto } from './dto/create-application.dto';
 import { UpdateApplicationDto } from './dto/update-application.dto';
-
+import { RolesGuard } from '../auth/roles.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { UseGuards } from '@nestjs/common';
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('recruiter', 'admin','candidate')
 @Controller('application')
 export class ApplicationController {
-  constructor(private readonly applicationService: ApplicationService) { }
+  constructor(private readonly applicationService: ApplicationService) {}
 
   @Post()
   create(@Body() createApplicationDto: CreateApplicationDto) {
@@ -74,21 +79,18 @@ export class ApplicationController {
   }
 
   @Get('user-applications/:userId')
-  getUserApplications(
-    @Param('userId') userId: string
-  ) {
+  getUserApplications(@Param('userId') userId: string) {
     return this.applicationService.getUserApplications(userId);
   }
 
-@Post(':applicationId/remind')
-async remindRecruiter(
-  @Param('applicationId') applicationId: string,
-  @Req() req,
-) {
-  return this.applicationService.sendReminderToRecruiter(
-    applicationId,
-    req.user.userId,
-  );
-}
-
+  @Post(':applicationId/remind')
+  async remindRecruiter(
+    @Param('applicationId') applicationId: string,
+    @Req() req,
+  ) {
+    return this.applicationService.sendReminderToRecruiter(
+      applicationId,
+      req.user.userId,
+    );
+  }
 }
