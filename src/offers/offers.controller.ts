@@ -1,34 +1,58 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { OffersService } from './offers.service';
+import { Controller, Get,Req, Post, Body, Patch, Param, UseGuards } from '@nestjs/common';
+import { OfferService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { UpdateOfferDto } from './dto/update-offer.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { SendOfferDto } from './dto/send-offer.dto';
+import { RespondOfferDto } from './dto/respond-offer.dto';
+@Controller('offer')
+@UseGuards(JwtAuthGuard,RolesGuard)
+@Roles('recruiter','admin')
+export class OfferController {
+  constructor(private service: OfferService) {}
 
-@Controller('offers')
-export class OffersController {
-  constructor(private readonly offersService: OffersService) {}
-
+  // Recruiter creates offer
   @Post()
-  create(@Body() createOfferDto: CreateOfferDto) {
-    return this.offersService.create(createOfferDto);
+  create(@Req() req, @Body() dto: CreateOfferDto) {
+    return this.service.createOffer(req.user.userId, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.offersService.findAll();
+  // Recruiter sends offer
+  @Post(':offerId/send')
+  send(
+    @Req() req,
+    @Param('offerId') offerId: string,
+    @Body() dto: SendOfferDto,
+  ) {
+    return this.service.sendOffer(offerId, req.user.userId, dto.message);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.offersService.findOne(+id);
+  // Candidate responds
+  @Post(':offerId/respond')
+  respond(
+    @Req() req,
+    @Param('offerId') offerId: string,
+    @Body() dto: RespondOfferDto,
+  ) {
+    return this.service.respondOffer(
+      offerId,
+      req.user.userId,
+      dto.action,
+      dto.notes,
+    );
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOfferDto: UpdateOfferDto) {
-    return this.offersService.update(+id, updateOfferDto);
+  // Candidate views offer
+  @Get('me')
+  myOffer(@Req() req) {
+    return this.service.getMyOffer(req.user.userId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.offersService.remove(+id);
+  // Recruiter views offer
+  @Get(':offerId')
+  get(@Param('offerId') offerId: string) {
+    return this.service.getOffer(offerId);
   }
 }
