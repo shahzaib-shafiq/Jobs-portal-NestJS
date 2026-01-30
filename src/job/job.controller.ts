@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { JobService } from './job.service';
 import { CreateJobDto } from './dto/create-job.dto';
@@ -26,10 +27,18 @@ export class JobController {
   }
 
   @Get()
-  findAll() {
-    return this.jobService.findAll();
+  findAll(
+    @Query('search') search?: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
+  ) {
+    return this.jobService.findAll({
+      search,
+      page: Number(page),
+      limit: Number(limit),
+    });
   }
-
+  
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.jobService.findOne(id);
