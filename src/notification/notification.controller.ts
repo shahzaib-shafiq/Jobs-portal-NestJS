@@ -45,13 +45,9 @@ export class NotificationController {
   @Delete(':id')
   remove(@Param('id') id: string) {}
 
-  @Get('unread-count')
-  getUnreadCount(@Req() req) {
-    return this.notificationService.getUnreadCount(req.user.userId);
-  }
+  @Get('counts')
+  getCounts(@Req() req) {
+  return this.notificationService.getCounts(req.user.userId);
+}
 
-  @Get('read-count')
-  getReadCount(@Req() req) {
-    return this.notificationService.getReadCount(req.user.userId);
-  }
 }
