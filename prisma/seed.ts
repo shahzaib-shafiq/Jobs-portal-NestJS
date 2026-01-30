@@ -1,4 +1,4 @@
-import { PrismaClient, Role, JobType, ApplicationStatus } from '@prisma/client';
+import { PrismaClient, Role, JobType, ApplicationStatus, InterviewType,InterviewRecommendation,InterviewStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -69,7 +69,8 @@ async function main() {
       email: 'alice.developer@email.com',
       password: hashedPassword,
       role: Role.candidate,
-      profileSummary: 'Full-stack developer with 5 years of experience in React, Node.js, and TypeScript',
+      profileSummary:
+        'Full-stack developer with 5 years of experience in React, Node.js, and TypeScript',
       resumeUrl: 'https://example.com/resumes/alice.pdf',
       address: '123 Main St, San Francisco, CA 94102',
       phone: '+1234567893',
@@ -84,7 +85,8 @@ async function main() {
       email: 'bob.engineer@email.com',
       password: hashedPassword,
       role: Role.candidate,
-      profileSummary: 'Backend engineer specializing in microservices and cloud architecture',
+      profileSummary:
+        'Backend engineer specializing in microservices and cloud architecture',
       resumeUrl: 'https://example.com/resumes/bob.pdf',
       address: '456 Oak Ave, New York, NY 10001',
       phone: '+1234567894',
@@ -99,7 +101,8 @@ async function main() {
       email: 'charlie.designer@email.com',
       password: hashedPassword,
       role: Role.candidate,
-      profileSummary: 'UI/UX designer with expertise in design systems and user research',
+      profileSummary:
+        'UI/UX designer with expertise in design systems and user research',
       resumeUrl: 'https://example.com/resumes/charlie.pdf',
       address: '789 Pine Rd, Seattle, WA 98101',
       phone: '+1234567895',
@@ -114,7 +117,8 @@ async function main() {
       email: 'diana.analyst@email.com',
       password: hashedPassword,
       role: Role.candidate,
-      profileSummary: 'Data analyst with experience in Python, SQL, and machine learning',
+      profileSummary:
+        'Data analyst with experience in Python, SQL, and machine learning',
       resumeUrl: 'https://example.com/resumes/diana.pdf',
       address: '321 Elm St, Austin, TX 78701',
       phone: '+1234567896',
@@ -129,7 +133,8 @@ async function main() {
       email: 'eve.developer@email.com',
       password: hashedPassword,
       role: Role.candidate,
-      profileSummary: 'Frontend developer passionate about React, Vue, and modern web technologies',
+      profileSummary:
+        'Frontend developer passionate about React, Vue, and modern web technologies',
       resumeUrl: 'https://example.com/resumes/eve.pdf',
       address: '654 Maple Dr, Boston, MA 02101',
       phone: '+1234567897',
@@ -144,7 +149,8 @@ async function main() {
   const company1 = await prisma.company.create({
     data: {
       name: 'TechCorp Solutions',
-      description: 'Leading technology solutions provider specializing in enterprise software development',
+      description:
+        'Leading technology solutions provider specializing in enterprise software development',
       industry: 'Technology',
       website: 'https://techcorp.com',
       logoUrl: 'https://example.com/logos/techcorp.png',
@@ -155,7 +161,8 @@ async function main() {
   const company2 = await prisma.company.create({
     data: {
       name: 'Innovate Labs',
-      description: 'Innovative startup focused on AI and machine learning solutions',
+      description:
+        'Innovative startup focused on AI and machine learning solutions',
       industry: 'Artificial Intelligence',
       website: 'https://innovatelabs.com',
       logoUrl: 'https://example.com/logos/innovatelabs.png',
@@ -192,7 +199,8 @@ async function main() {
   const job1 = await prisma.job.create({
     data: {
       title: 'Senior Full-Stack Developer',
-      description: 'We are looking for an experienced full-stack developer to join our team. You will work on building scalable web applications using React, Node.js, and TypeScript.',
+      description:
+        'We are looking for an experienced full-stack developer to join our team. You will work on building scalable web applications using React, Node.js, and TypeScript.',
       location: 'San Francisco, CA',
       jobType: JobType.FULL_TIME,
       salary: 120000,
@@ -209,7 +217,8 @@ async function main() {
   const job2 = await prisma.job.create({
     data: {
       title: 'Backend Engineer',
-      description: 'Join our backend team to build robust APIs and microservices. Experience with distributed systems and cloud platforms required.',
+      description:
+        'Join our backend team to build robust APIs and microservices. Experience with distributed systems and cloud platforms required.',
       location: 'New York, NY',
       jobType: JobType.FULL_TIME,
       salary: 130000,
@@ -225,12 +234,19 @@ async function main() {
   const job3 = await prisma.job.create({
     data: {
       title: 'UI/UX Designer',
-      description: 'We are seeking a creative UI/UX designer to help shape the user experience of our products. Portfolio required.',
+      description:
+        'We are seeking a creative UI/UX designer to help shape the user experience of our products. Portfolio required.',
       location: 'Seattle, WA',
       jobType: JobType.FULL_TIME,
       salary: 95000,
       industry: 'Design',
-      skills: ['Figma', 'Adobe XD', 'User Research', 'Prototyping', 'Design Systems'],
+      skills: [
+        'Figma',
+        'Adobe XD',
+        'User Research',
+        'Prototyping',
+        'Design Systems',
+      ],
       year: 3,
       budget: 110000,
       createdById: recruiter2.id,
@@ -241,7 +257,8 @@ async function main() {
   const job4 = await prisma.job.create({
     data: {
       title: 'Data Analyst',
-      description: 'Analyze complex datasets and provide insights to drive business decisions. Experience with Python and SQL required.',
+      description:
+        'Analyze complex datasets and provide insights to drive business decisions. Experience with Python and SQL required.',
       location: 'Austin, TX',
       jobType: JobType.FULL_TIME,
       salary: 85000,
@@ -257,7 +274,8 @@ async function main() {
   const job5 = await prisma.job.create({
     data: {
       title: 'Frontend Developer',
-      description: 'Build beautiful and responsive user interfaces using modern frontend frameworks. React or Vue experience preferred.',
+      description:
+        'Build beautiful and responsive user interfaces using modern frontend frameworks. React or Vue experience preferred.',
       location: 'Boston, MA',
       jobType: JobType.FULL_TIME,
       salary: 100000,
@@ -273,7 +291,8 @@ async function main() {
   const job6 = await prisma.job.create({
     data: {
       title: 'DevOps Engineer',
-      description: 'Manage our cloud infrastructure and CI/CD pipelines. Experience with AWS, Docker, and Kubernetes required.',
+      description:
+        'Manage our cloud infrastructure and CI/CD pipelines. Experience with AWS, Docker, and Kubernetes required.',
       location: 'Remote',
       jobType: JobType.REMOTE,
       salary: 115000,
@@ -289,7 +308,8 @@ async function main() {
   const job7 = await prisma.job.create({
     data: {
       title: 'Marketing Intern',
-      description: 'Great opportunity for students to gain experience in digital marketing. Part-time position.',
+      description:
+        'Great opportunity for students to gain experience in digital marketing. Part-time position.',
       location: 'Remote',
       jobType: JobType.INTERN,
       salary: 20000,
@@ -305,7 +325,8 @@ async function main() {
   const job8 = await prisma.job.create({
     data: {
       title: 'Contract Frontend Developer',
-      description: '6-month contract position for a frontend developer to work on a specific project.',
+      description:
+        '6-month contract position for a frontend developer to work on a specific project.',
       location: 'Remote',
       jobType: JobType.CONTRACT,
       salary: 80000,
@@ -318,18 +339,39 @@ async function main() {
     },
   });
 
+// const application2 = await prisma.application.create({
+//   data: {
+//     userId: candidate2.id,
+//     jobId: job1.id,
+//     status: 'APPLIED',
+//   },
+// });
+
+// const application3 = await prisma.application.create({
+//   data: {
+//     userId: candidate3.id,
+//     jobId: job2.id,
+//     status: 'APPLIED',
+//   },
+// });
+
+
+console.log('✅ Created application1');
+
+
   console.log(`✅ Created ${8} jobs`);
 
   // Create Applications (Many users applying to many jobs)
   console.log('📝 Creating applications...');
-  
+
   // Alice applies to multiple jobs
   const app1 = await prisma.application.create({
     data: {
       userId: candidate1.id,
       jobId: job1.id,
       status: ApplicationStatus.PENDING,
-      coverLetter: 'I am excited to apply for this position. I have 5 years of experience in full-stack development.',
+      coverLetter:
+        'I am excited to apply for this position. I have 5 years of experience in full-stack development.',
       resumeUrl: 'https://example.com/resumes/alice.pdf',
       gpa: 3.8,
       skillSummary: 'Expert in React, Node.js, TypeScript, and PostgreSQL',
@@ -353,7 +395,8 @@ async function main() {
       userId: candidate2.id,
       jobId: job2.id,
       status: ApplicationStatus.PENDING,
-      coverLetter: 'I have extensive experience in backend development and microservices.',
+      coverLetter:
+        'I have extensive experience in backend development and microservices.',
       resumeUrl: 'https://example.com/resumes/bob.pdf',
       gpa: 3.6,
       skillSummary: 'Strong background in Python, Docker, and Kubernetes',
@@ -375,7 +418,7 @@ async function main() {
     data: {
       userId: candidate3.id,
       jobId: job3.id,
-      status: ApplicationStatus.HIRED,
+      status: ApplicationStatus.PENDING,
       coverLetter: 'I am a passionate UI/UX designer with a strong portfolio.',
       resumeUrl: 'https://example.com/resumes/charlie.pdf',
       gpa: 3.9,
@@ -389,7 +432,8 @@ async function main() {
       userId: candidate4.id,
       jobId: job4.id,
       status: ApplicationStatus.PENDING,
-      coverLetter: 'I have a strong background in data analysis and machine learning.',
+      coverLetter:
+        'I have a strong background in data analysis and machine learning.',
       resumeUrl: 'https://example.com/resumes/diana.pdf',
       gpa: 3.7,
       skillSummary: 'Proficient in Python, SQL, and data visualization',
@@ -412,7 +456,8 @@ async function main() {
       userId: candidate5.id,
       jobId: job5.id,
       status: ApplicationStatus.PENDING,
-      coverLetter: 'I am a frontend developer with experience in React and Vue.',
+      coverLetter:
+        'I am a frontend developer with experience in React and Vue.',
       resumeUrl: 'https://example.com/resumes/eve.pdf',
       gpa: 3.5,
     },
@@ -488,39 +533,7 @@ async function main() {
   console.log(`✅ Created ${6} saved jobs`);
 
   // Create Notifications
-  console.log('🔔 Creating notifications...');
-  await prisma.notification.create({
-    data: {
-      userId: candidate1.id,
-      message: 'Your application for Senior Full-Stack Developer has been received',
-      isRead: false,
-    },
-  });
-
-  await prisma.notification.create({
-    data: {
-      userId: candidate1.id,
-      message: 'Your application status has been updated to SHORTLISTED',
-      isRead: true,
-    },
-  });
-
-  await prisma.notification.create({
-    data: {
-      userId: candidate2.id,
-      message: 'New job posting: DevOps Engineer',
-      isRead: false,
-    },
-  });
-
-  await prisma.notification.create({
-    data: {
-      userId: candidate3.id,
-      message: 'Congratulations! You have been HIRED for UI/UX Designer position',
-      isRead: true,
-    },
-  });
-
+  // 🔔 Notifications Seed
   await prisma.notification.create({
     data: {
       userId: candidate4.id,
@@ -531,9 +544,34 @@ async function main() {
 
   await prisma.notification.create({
     data: {
-      userId: recruiter1.id,
-      message: 'You have received 3 new applications for Senior Full-Stack Developer',
+      userId: candidate2.id,
+      message: 'You have been invited to complete an assessment',
       isRead: false,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: candidate3.id,
+      message: 'Your interview has been scheduled',
+      isRead: false,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: recruiter1.id,
+      message:
+        'You have received 3 new applications for Senior Full-Stack Developer',
+      isRead: false,
+    },
+  });
+
+  await prisma.notification.create({
+    data: {
+      userId: recruiter1.id,
+      message: 'An assessment has been submitted by a candidate',
+      isRead: true,
     },
   });
 
@@ -545,9 +583,139 @@ async function main() {
     },
   });
 
-  console.log(`✅ Created ${7} notifications`);
+  await prisma.notification.create({
+    data: {
+      userId: admin.id,
+      message: 'Daily platform activity summary is ready',
+      isRead: false,
+    },
+  });
+
+  console.log(`✅ Created 7 notifications`);
+
+  // 📝 Assessments
+  const assessment1 = await prisma.assessment.create({
+    data: {
+      title: 'Frontend Technical Assessment',
+      description: 'Basic React & JavaScript skills test',
+      createdById: recruiter2.id,
+      applicationId: app2.id,
+    },
+  });
+
+  const question1 = await prisma.assessmentQuestion.create({
+    data: {
+      assessmentId: assessment1.id,
+      questionText: 'Explain React hooks',
+      type: 'TEXT',
+      order: 1,
+    },
+  });
+
+  const question2 = await prisma.assessmentQuestion.create({
+    data: {
+      assessmentId: assessment1.id,
+      questionText: 'Have you worked with TypeScript?',
+      type: 'BOOLEAN',
+      order: 2,
+    },
+  });
+
+  // 📤 Assessment Submission
+  const submission1 = await prisma.assessmentSubmission.create({
+    data: {
+      assessmentId: assessment1.id,
+      candidateId: candidate1.id,
+      submittedAt: new Date(),
+      status: 'SUBMITTED',
+    },
+  });
+
+  await prisma.assessmentAnswer.create({
+    data: {
+      submissionId: submission1.id,
+      questionId: question1.id,
+      textAnswer:
+        'Hooks allow state and lifecycle features in functional components.',
+    },
+  });
+
+  await prisma.assessmentAnswer.create({
+    data: {
+      submissionId: submission1.id,
+      questionId: question2.id,
+      booleanAnswer: true,
+    },
+  });
+  // 🎤 Interview
+  const interview1 = await prisma.interview.create({
+    data: {
+      applicationId: app3.id,
+      type: 'TECHNICAL',
+      round: 1,
+      status: 'SCHEDULED',
+      scheduledAt: new Date(Date.now() + 86400000),
+      durationMin: 60,
+      createdById: recruiter2.id,
+    },
+  });
+
+  await prisma.interviewInterviewer.create({
+    data: {
+      interviewId: interview1.id,
+      interviewerId: recruiter2.id,
+    },
+  });
+
+  await prisma.interviewFeedback.create({
+    data: {
+      interviewId: interview1.id,
+      // type: InterviewType.MANAGERIAL,
+      interviewerId: recruiter2.id,
+      score: 8,
+      recommendation: InterviewRecommendation.STRONG_YES,
+      notes: 'Strong React fundamentals',
+            
+    },
+  });
+  // 💼 Offer
+  const offer1 = await prisma.offer.create({
+    data: {
+      applicationId: app3.id,
+      candidateId: candidate1.id,
+      createdById: recruiter1.id,
+      title: 'Senior Frontend Developer',
+      employmentType: 'FULL_TIME',
+      baseSalary: 95000,
+      currency: 'USD',
+      status: 'SENT',
+      sentAt: new Date(),
+    },
+  });
+
+  await prisma.offerHistory.create({
+    data: {
+      offerId: offer1.id,
+      action: 'CREATED',
+      createdById: recruiter1.id,
+      notes: 'Initial offer sent',
+    },
+  });
+  // 🔗 Referral
+  await prisma.referral.create({
+    data: {
+      code: 'REF-FE-2026',
+      referrerId: recruiter1.id,
+      jobId: job1.id,
+    },
+  });
 
   console.log('\n✨ Database seeded successfully!');
+  console.log('✅ Created assessments');
+  console.log('✅ Created assessment submissions & answers');
+  console.log('✅ Created interviews & feedback');
+  console.log('✅ Created offers & offer history');
+  console.log('✅ Created referrals');
   console.log('\n📊 Summary:');
   console.log(`   - Users: 8 (1 admin, 2 recruiters, 5 candidates)`);
   console.log(`   - Companies: 4`);
@@ -559,6 +727,7 @@ async function main() {
   console.log('   Admin: admin@jobsportal.com / password123');
   console.log('   Recruiter: john.recruiter@techcorp.com / password123');
   console.log('   Candidate: alice.developer@email.com / password123');
+  
 }
 
 main()
