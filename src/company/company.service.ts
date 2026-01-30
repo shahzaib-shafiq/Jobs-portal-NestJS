@@ -13,15 +13,59 @@ export class CompanyService {
     });
   }
 
-  async findAll() {
-    return this.prisma.company.findMany({
-      include: {
-        createdBy: true, // optional: include user who created the company
-        jobs: true, // optional: include related jobs
+  async findAll({
+    search,
+    page,
+    limit,
+  }: {
+    search?: string;
+    page: number;
+    limit: number;
+  }) {
+    const skip = (page - 1) * limit;
+  
+    const where: any = {
+      isDeleted: false,
+    };
+  
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { industry: { contains: search, mode: 'insensitive' } },
+        { location: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+  
+    const [companies, total] = await this.prisma.$transaction([
+      this.prisma.company.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          createdBy: true, // optional
+          _count: {
+            select: {
+              jobs: true,
+            },
+          },
+        },
+      }),
+      this.prisma.company.count({ where }),
+    ]);
+  
+    return {
+      data: companies,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
-
+  
   async findOne(id: string) {
     const company = await this.prisma.company.findUnique({
       where: { id },

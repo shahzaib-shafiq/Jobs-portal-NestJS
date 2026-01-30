@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -27,9 +28,17 @@ export class CompanyController {
   }
 
   @Get()
-  findAll() {
-    return this.companyService.findAll();
-  }
+findAll(
+  @Query('search') search?: string,
+  @Query('page') page = '1',
+) {
+  return this.companyService.findAll({
+    search,
+    page: Number(page),
+    limit: 10,
+  });
+}
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.companyService.findOne(id);
