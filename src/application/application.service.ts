@@ -54,6 +54,13 @@ export class ApplicationService {
         `Job with ID ${createApplicationDto.jobId} not found`,
       );
     }
+    if (job.createdById && job.createdById.trim() !== '') {
+      let notification = await this.notificationService.create({
+        userId: job.createdById,
+        message: `A new candidate has applied for "${job.title}".`,
+      });
+      console.log(notification);
+    }
 
     return this.prisma.application.create({
       data: {
