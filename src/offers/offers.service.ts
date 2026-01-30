@@ -105,4 +105,19 @@ export class OfferService {
       include: { histories: true },
     });
   }
+
+  async deleteOffer(offerId: string) {
+    return this.prisma.offer.update({
+      where: { id: offerId },
+      data: { isDeleted: true },
+      include: { histories: true },
+    });
+  }
+
+  async getAllOffers() {
+    return this.prisma.offer.findMany({
+      include: { histories: true },
+      where: { isDeleted: false },
+    });
+  }
 }
