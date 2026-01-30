@@ -6,13 +6,15 @@ import {
   Param,
   Post,
   Req,
+  UseGuards
 } from '@nestjs/common';
 import { ReferralService } from './refrals.service';
 import { CreateReferralDto } from './dto/create-refral.dto';
 import { ApplyReferralDto } from './dto/apply-referral.dto';
-
+import { RolesGuard } from '../auth/roles.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
-
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('referrals')
 export class ReferralController {
   constructor(private readonly referralService: ReferralService) {}
@@ -21,7 +23,8 @@ export class ReferralController {
   @Roles('recruiter', 'admin')
   @Post()
   create(@Req() req, @Body() dto: CreateReferralDto) {
-    const userId = req.user.userId;
+    console.log(req);
+    const userId =  req.user.userId;
     return this.referralService.createReferral(userId, dto);
   }
 
@@ -35,7 +38,8 @@ export class ReferralController {
   @Roles('recruiter', 'admin')
   @Get('me')
   getMyReferrals(@Req() req) {
-    const userId = req.user.userId;
+    console.log(req.user);
+    const userId =  req.user.userId;
     return this.referralService.getMyCreatedReferrals(userId);
   }
 
@@ -43,7 +47,7 @@ export class ReferralController {
   @Roles('recruiter', 'admin')
   @Delete(':id')
   delete(@Req() req, @Param('id') id: string) {
-    const userId = req.user.userId;
+    const userId =  req.user.userId;
     return this.referralService.deleteReferral(id, userId);
   }
 }
