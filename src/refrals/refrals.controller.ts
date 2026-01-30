@@ -6,7 +6,7 @@ import {
   Param,
   Post,
   Req,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { ReferralService } from './refrals.service';
 import { CreateReferralDto } from './dto/create-refral.dto';
@@ -23,7 +23,6 @@ export class ReferralController {
   @Roles('recruiter', 'admin')
   @Post()
   create(@Req() req, @Body() dto: CreateReferralDto) {
-    console.log(req);
     const userId =  req.user.userId;
     return this.referralService.createReferral(userId, dto);
   }

@@ -92,4 +92,27 @@ export class NotificationService {
       },
     });
   }
+
+  async getCounts(userId: string) {
+    const [unreadCount, readCount] = await this.prisma.$transaction([
+      this.prisma.notification.count({
+        where: {
+          userId,
+          isRead: false,
+        },
+      }),
+      this.prisma.notification.count({
+        where: {
+          userId,
+          isRead: true,
+        },
+      }),
+    ]);
+
+    return {
+      unread: unreadCount,
+      read: readCount,
+      total: unreadCount + readCount,
+    };
+  }
 }

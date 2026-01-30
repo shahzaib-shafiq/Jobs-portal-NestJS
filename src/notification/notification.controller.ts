@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
@@ -43,4 +44,10 @@ export class NotificationController {
 
   @Delete(':id')
   remove(@Param('id') id: string) {}
+
+  @Get('counts')
+  getCounts(@Req() req) {
+  return this.notificationService.getCounts(req.user.userId);
+}
+
 }

@@ -13,15 +13,64 @@ export class JobService {
     });
   }
 
-  async findAll() {
-    return this.prisma.job.findMany({
-      include: {
-        createdBy: true, // ✅ include user who created the job
-        company: true, // ✅ include company info
-        applications: true,
-        savedJobs: true,
+  // async findAll() {
+  //   return this.prisma.job.findMany({
+  //     include: {
+  //       createdBy: true, // ✅ include user who created the job
+  //       company: true, // ✅ include company info
+  //       applications: true,
+  //       savedJobs: true,
+  //     },
+  //   });
+  // }
+
+  async findAll({
+    search,
+    page,
+    limit,
+  }: {
+    search?: string;
+    page: number;
+    limit: number;
+  }) {
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      isDeleted: false,
+    };
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { location: { contains: search, mode: 'insensitive' } },
+        { industry: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [jobs, total] = await this.prisma.$transaction([
+      this.prisma.job.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          company: true,
+          createdBy: true,
+        },
+      }),
+      this.prisma.job.count({ where }),
+    ]);
+
+    return {
+      data: jobs,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-    });
+    };
   }
 
   async findOne(id: string) {

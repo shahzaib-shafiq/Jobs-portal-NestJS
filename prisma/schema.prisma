@@ -157,6 +157,7 @@ model Company {
   description String?
   industry    String?
   website     String?
+  location    String?
   logoUrl     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
