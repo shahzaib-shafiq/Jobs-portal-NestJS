@@ -11,6 +11,94 @@ generator client {
 }
 
 // -------------------------
+// Enums
+// -------------------------
+
+
+enum SubmissionStatus {
+  PENDING
+  SUBMITTED
+  REVIEWED
+}
+
+enum InterviewType {
+  HR
+  TECHNICAL
+  MANAGERIAL
+  CULTURE
+  FINAL
+}
+
+enum InterviewStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELED
+}
+
+enum InterviewRecommendation {
+  STRONG_YES
+  YES
+  NO
+  STRONG_NO
+}
+
+enum QuestionType {
+  TEXT
+  BOOLEAN
+}
+
+enum AssessmentSubmissionStatus {
+  PENDING
+  SUBMITTED
+  REVIEWED
+}
+
+enum Role {
+  candidate
+  recruiter
+  admin
+}
+
+enum JobType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERN
+  REMOTE
+}
+
+enum ApplicationStatus {
+  PENDING
+  SHORTLISTED
+  REJECTED
+  HIRED
+}
+
+enum OfferStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum OfferHistoryAction {
+  CREATED
+  SENT
+  UPDATED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+}
+
+
+// -------------------------
 // Models
 // -------------------------
 model User {
@@ -52,6 +140,11 @@ model User {
 
   // ✅ OFFER HISTORY
   offerHistories OfferHistory[] @relation("OfferHistoryCreatedBy")
+
+  // Referrals
+referralsCreated Referral[] @relation("ReferralReferrer")
+referralsUsed    Referral[] @relation("ReferralReferee")
+
 
   @@index([email])
   @@index([role])
@@ -102,6 +195,8 @@ model Job {
 
   applications Application[]
   savedJobs    SavedJob[]
+  referrals Referral[]
+
 }
 
 model Application {
@@ -222,11 +317,6 @@ model AssessmentSubmission {
   @@unique([assessmentId, candidateId])
 }
 
-enum SubmissionStatus {
-  PENDING
-  SUBMITTED
-  REVIEWED
-}
 
 model AssessmentAnswer {
   id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
@@ -358,82 +448,43 @@ model OfferHistory {
   createdAt DateTime @default(now())
 }
 
-// -------------------------
-// Enums
-// -------------------------
+model Refral {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-enum InterviewType {
-  HR
-  TECHNICAL
-  MANAGERIAL
-  CULTURE
-  FINAL
+
+  createdAt DateTime @default(now())
+
 }
 
-enum InterviewStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELED
-}
 
-enum InterviewRecommendation {
-  STRONG_YES
-  YES
-  NO
-  STRONG_NO
-}
+model Referral {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 
-enum QuestionType {
-  TEXT
-  BOOLEAN
-}
+  // Referral code
+  code String @unique
 
-enum AssessmentSubmissionStatus {
-  PENDING
-  SUBMITTED
-  REVIEWED
-}
+  // Who created the referral
+  referrerId String @db.Uuid
+  referrer   User   @relation("ReferralReferrer", fields: [referrerId], references: [id])
 
-enum Role {
-  candidate
-  recruiter
-  admin
-}
+  // Job being referred
+  jobId String @db.Uuid
+  job   Job    @relation(fields: [jobId], references: [id])
 
-enum JobType {
-  FULL_TIME
-  PART_TIME
-  CONTRACT
-  INTERN
-  REMOTE
-}
+  // Who used the referral (nullable until used)
+  refereeId String? @db.Uuid
+  referee   User?   @relation("ReferralReferee", fields: [refereeId], references: [id])
 
-enum ApplicationStatus {
-  PENDING
-  SHORTLISTED
-  REJECTED
-  HIRED
-}
+  isUsed Boolean  @default(false)
+  usedAt DateTime?
 
-enum OfferStatus {
-  DRAFT
-  SENT
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
-}
+  isDeleted Boolean @default(false)
 
-enum OfferHistoryAction {
-  CREATED
-  SENT
-  UPDATED
-  ACCEPTED
-  REJECTED
-  WITHDRAWN
-}
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-enum EmploymentType {
-  FULL_TIME
-  PART_TIME
-  CONTRACT
+  @@index([code])
+  @@index([referrerId])
+  @@index([jobId])
+  @@index([refereeId])
 }
