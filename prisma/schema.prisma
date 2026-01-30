@@ -46,6 +46,12 @@ model User {
   interviewsCreated     Interview[]            @relation("InterviewCreatedBy")
   interviewFeedbacks    InterviewFeedback[]
   interviewAssignments  InterviewInterviewer[]
+  // ✅ OFFERS
+  offersCreated         Offer[]                @relation("OfferCreatedBy")
+  offersReceived        Offer[]                @relation("OfferCandidate")
+
+  // ✅ OFFER HISTORY
+  offerHistories OfferHistory[] @relation("OfferHistoryCreatedBy")
 
   @@index([email])
   @@index([role])
@@ -125,6 +131,7 @@ model Application {
 
   assessments Assessment[]
   interviews  Interview[]
+  offer       Offer?
 
   // ✅ Unique constraint: prevent duplicate applications (same user applying to same job)
   @@unique([userId, jobId])
@@ -263,6 +270,10 @@ model Interview {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   isDeleted Boolean  @default(false)
+
+  @@unique([applicationId, round])
+  @@index([applicationId])
+  @@index([scheduledAt])
 }
 
 model InterviewInterviewer {
@@ -293,6 +304,58 @@ model InterviewFeedback {
   createdAt DateTime @default(now())
 
   @@unique([interviewId, interviewerId])
+}
+
+model Offer {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  applicationId String      @db.Uuid
+  application   Application @relation(fields: [applicationId], references: [id])
+
+  candidateId String @db.Uuid
+  candidate   User   @relation("OfferCandidate", fields: [candidateId], references: [id])
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("OfferCreatedBy", fields: [createdById], references: [id])
+
+  title          String
+  employmentType EmploymentType
+
+  baseSalary Float?
+  bonus      Float?
+  equity     Float?
+  currency   String @default("USD")
+
+  startDate DateTime?
+  location  String?
+  notes     String?
+
+  status      OfferStatus @default(DRAFT)
+  sentAt      DateTime?
+  respondedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  histories OfferHistory[]
+
+  @@unique([applicationId])
+}
+
+model OfferHistory {
+  id String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+
+  offerId String @db.Uuid
+  offer   Offer  @relation(fields: [offerId], references: [id])
+
+  action OfferHistoryAction
+  notes  String?
+
+  createdById String @db.Uuid
+  createdBy   User   @relation("OfferHistoryCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
 }
 
 // -------------------------
@@ -350,4 +413,27 @@ enum ApplicationStatus {
   SHORTLISTED
   REJECTED
   HIRED
+}
+
+enum OfferStatus {
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum OfferHistoryAction {
+  CREATED
+  SENT
+  UPDATED
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
 }
