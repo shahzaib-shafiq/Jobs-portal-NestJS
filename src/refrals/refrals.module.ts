@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { RefralsService } from './refrals.service';
-import { RefralsController } from './refrals.controller';
+import { ReferralService } from './refrals.service';
+import { ReferralController} from './refrals.controller';
 
 @Module({
-  controllers: [RefralsController],
-  providers: [RefralsService],
+  controllers: [ReferralController],
+  providers: [ReferralService],
 })
 export class RefralsModule {}
