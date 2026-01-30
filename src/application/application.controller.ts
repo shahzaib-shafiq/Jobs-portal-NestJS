@@ -23,8 +23,8 @@ export class ApplicationController {
   constructor(private readonly applicationService: ApplicationService) {}
 
   @Post()
-  create(@Body() createApplicationDto: CreateApplicationDto) {
-    return this.applicationService.create(createApplicationDto);
+  create(@Body() createApplicationDto: CreateApplicationDto, @Req() req) {
+    return this.applicationService.create(createApplicationDto, req.user.userId as string);
   }
 
   @Get()

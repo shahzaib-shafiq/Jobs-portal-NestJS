@@ -17,11 +17,11 @@ export class ApplicationService {
   ) {}
 
   // ✅ Create Application (Users can apply to many jobs)
-  async create(createApplicationDto: CreateApplicationDto) {
+  async create(createApplicationDto: CreateApplicationDto, userId: string) {
     // Check if user has already applied to this job
     const existingApplication = await this.prisma.application.findFirst({
       where: {
-        userId: createApplicationDto.userId,
+        userId: userId,
         jobId: createApplicationDto.jobId,
         isDeleted: false,
       },
@@ -35,12 +35,12 @@ export class ApplicationService {
 
     // Verify user exists
     const user = await this.prisma.user.findUnique({
-      where: { id: createApplicationDto.userId },
+      where: { id:userId },
     });
 
     if (!user) {
       throw new NotFoundException(
-        `User with ID ${createApplicationDto.userId} not found`,
+        `User with ID ${userId} not found`,
       );
     }
 
@@ -65,6 +65,7 @@ export class ApplicationService {
     return this.prisma.application.create({
       data: {
         ...createApplicationDto,
+        userId: userId,
       },
       include: {
         user: true,

@@ -12,9 +12,9 @@ export class CreateApplicationDto {
   @IsNotEmpty()
   jobId: string;
 
-  @IsUUID()
-  @IsNotEmpty()
-  userId: string;
+  // @IsUUID()
+  // @IsNotEmpty()
+  // userId: string;
 
   @IsOptional()
   @IsString()

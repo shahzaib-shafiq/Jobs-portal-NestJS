@@ -108,12 +108,11 @@ export class NotificationService {
         },
       }),
     ]);
-  
+
     return {
       unread: unreadCount,
       read: readCount,
       total: unreadCount + readCount,
     };
   }
-  
 }
