@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { RefralsService } from './refrals.service';
-import { CreateRefralDto } from './dto/create-refral.dto';
-import { UpdateRefralDto } from './dto/update-refral.dto';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Req,
+  UseGuards
+} from '@nestjs/common';
+import { ReferralService } from './refrals.service';
+import { CreateReferralDto } from './dto/create-refral.dto';
+import { ApplyReferralDto } from './dto/apply-referral.dto';
+import { RolesGuard } from '../auth/roles.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('referrals')
+export class ReferralController {
+  constructor(private readonly referralService: ReferralService) {}
 
-@Controller('refrals')
-export class RefralsController {
-  constructor(private readonly refralsService: RefralsService) {}
-
+  // ✅ Create referral
+  @Roles('recruiter', 'admin')
   @Post()
-  create(@Body() createRefralDto: CreateRefralDto) {
-    return this.refralsService.create(createRefralDto);
+  create(@Req() req, @Body() dto: CreateReferralDto) {
+    console.log(req);
+    const userId =  req.user.userId;
+    return this.referralService.createReferral(userId, dto);
   }
 
-  @Get()
-  findAll() {
-    return this.refralsService.findAll();
+  // ✅ Apply referral code
+  @Post('apply')
+  apply(@Body() dto: ApplyReferralDto) {
+    return this.referralService.applyReferral(dto);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.refralsService.findOne(+id);
+  // ✅ Get my created referrals
+  @Roles('recruiter', 'admin')
+  @Get('me')
+  getMyReferrals(@Req() req) {
+    console.log(req.user);
+    const userId =  req.user.userId;
+    return this.referralService.getMyCreatedReferrals(userId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRefralDto: UpdateRefralDto) {
-    return this.refralsService.update(+id, updateRefralDto);
-  }
-
+  // ✅ Delete referral
+  @Roles('recruiter', 'admin')
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.refralsService.remove(+id);
+  delete(@Req() req, @Param('id') id: string) {
+    const userId =  req.user.userId;
+    return this.referralService.deleteReferral(id, userId);
   }
 }

@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateRefralDto } from './create-refral.dto';
+import { CreateReferralDto } from './create-refral.dto';
 
-export class UpdateRefralDto extends PartialType(CreateRefralDto) {}
+export class UpdateReferralDto extends PartialType(CreateReferralDto) {}
